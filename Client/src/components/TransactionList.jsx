@@ -12,7 +12,7 @@ export default function TransactionList() {
       <h2 className="text-xl font-bold mb-4 text-gray-800">Transaction List</h2>
       <ul>
         {transactions.map((transaction) => (
-          <li key={transaction.id} className="flex justify-between items-center mb-3 p-3 border-b">
+          <li key={transaction._id} className="flex justify-between items-center mb-3 p-3 border-b">
             <div>
               <h4 className="font-semibold">{transaction.text}</h4>
               <p className={transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}>
@@ -22,7 +22,7 @@ export default function TransactionList() {
             <div className="flex space-x-2">
               
               <button
-                onClick={() => deleteTransaction(transaction.id)}
+                onClick={() => deleteTransaction(transaction._id)} // 👈 Fix is here
                 className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
               >
                 Delete

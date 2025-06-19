@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useUser } from '../components/UserContext';
+import { useUser } from '../components/UserContext'; // Import from your UserContext
 import { motion } from 'framer-motion';
 
 export default function Sidebar() {
@@ -7,7 +7,7 @@ export default function Sidebar() {
 
   const handleSignOut = () => {
     signOut();
-    // Redirect to auth page or home
+    // Redirect to auth page
     window.location.href = '/auth';
   };
 
@@ -29,38 +29,33 @@ export default function Sidebar() {
             <img 
               src={user.avatar} 
               alt={user.name}
-              className="w-12 h-12 rounded-full border-2 border-blue-400"
+              className="w-12 h-12 rounded-full border-2 border-blue-400 object-cover"
             />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-white truncate">
                 {user.name}
               </p>
-              <p className="text-xs text-gray-00 truncate">
+              <p className="text-xs text-gray-400 truncate">
                 @{user.username}
               </p>
             </div>
           </div>
           <Link 
             to="/profile" 
-            className="block text-center  bg-blue-100 hover:bg-blue-700 text-black text-sm py-2 px-3 rounded transition-colors duration-200"
+            className="block text-center bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-3 rounded transition-colors duration-200"
           >
             View Profile
           </Link>
         </motion.div>
       ) : (
         <motion.div 
-          className="bg-gray-800 rounded-lg p-4 mb-4 text-center"
+          className="bg-gray-00 rounded-lg p-4 text-center"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <p className="text-sm text-gray-300 mb-3">Welcome to Financio!</p>
-          <Link 
-            to="/auth" 
-            className="block bg-black hover:from-blue-700 hover:to-green-500 text-white text-sm py-2 px-3 rounded transition-all duration-200"
-          >
-            Sign In / Sign Up
-          </Link>
+          
+          
         </motion.div>
       )}
 

@@ -1,17 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useTransactions } from '../components/TransactionContext';
-import axios from 'axios';
 
 export default function TransactionForm({ editTransaction, onEditComplete, onCancel }) {
-  const { fetchTransactions } = useTransactions();
+  const { addTransaction, updateTransaction } = useTransactions();
 
   const [text, setText] = useState('');
   const [amount, setAmount] = useState('');
   const [type, setType] = useState('income');
 
-  const API_URL = 'http://localhost:5000/api/transactions';
-
-  // Pre-populate form when editing
   useEffect(() => {
     if (editTransaction) {
       setText(editTransaction.text);
@@ -22,34 +18,26 @@ export default function TransactionForm({ editTransaction, onEditComplete, onCan
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const transactionData = {
+      text,
+      amount: Number(amount),
+      type
+    };
+
     try {
       if (editTransaction) {
-        // Update existing transaction
-        await axios.put(`${API_URL}/${editTransaction.id}`, {
-          text,
-          amount: Number(amount),
-          type,
-        });
-        onEditComplete?.(); // Exit edit mode
+        await updateTransaction(editTransaction._id, transactionData);
+        onEditComplete?.();
       } else {
-        // Add new transaction
-        await axios.post(API_URL, {
-          text,
-          amount: Number(amount),
-          type,
-        });
-
-        // Reset form
+        await addTransaction(transactionData);
         setText('');
         setAmount('');
         setType('income');
       }
-
-      // Refresh transaction list
-      fetchTransactions();
     } catch (error) {
-      console.error('Error saving transaction:', error);
-      alert('Failed to save transaction. Check your backend, it’s probably taking a nap.');
+      console.error('❌ Error saving transaction:', error);
+      alert('Failed to save transaction. Backend probably fainted.');
     }
   };
 
@@ -70,9 +58,7 @@ export default function TransactionForm({ editTransaction, onEditComplete, onCan
       </h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label className="block text-gray-700 font-bold mb-2">
-            Transaction Name
-          </label>
+          <label className="block text-gray-700 font-bold mb-2">Transaction Name</label>
           <input
             type="text"
             value={text}
@@ -84,9 +70,7 @@ export default function TransactionForm({ editTransaction, onEditComplete, onCan
         </div>
 
         <div className="mb-4">
-          <label className="block text-gray-700 font-bold mb-2">
-            Amount (₹)
-          </label>
+          <label className="block text-gray-700 font-bold mb-2">Amount (₹)</label>
           <input
             type="number"
             value={amount}
@@ -100,9 +84,7 @@ export default function TransactionForm({ editTransaction, onEditComplete, onCan
         </div>
 
         <div className="mb-4">
-          <label className="block text-gray-700 font-bold mb-2">
-            Transaction Type
-          </label>
+          <label className="block text-gray-700 font-bold mb-2">Transaction Type</label>
           <select
             value={type}
             onChange={(e) => setType(e.target.value)}

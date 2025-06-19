@@ -9,12 +9,12 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('✅ Connected to MongoDB Compass successfully'))
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('✅ Connected to MongoDB Atlas successfully'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: [process.env.CLIENT_URL, 'http://localhost:5173'], // ✅ Allow both deployed and local frontend
   credentials: true
 }));
 
@@ -33,10 +33,9 @@ const Transaction = mongoose.model('Transaction', transactionSchema);
 
 // Routes
 app.get("/", (req, res) => {
-  res.json({ message: "Financio API is running with MongoDB!" });
+  res.json({ message: "Financio API is running with MongoDB Atlas!" });
 });
 
-// Get all transactions
 app.get("/api/transactions", async (req, res) => {
   try {
     const transactions = await Transaction.find();
@@ -46,7 +45,6 @@ app.get("/api/transactions", async (req, res) => {
   }
 });
 
-// Get specific transaction
 app.get("/api/transactions/:id", async (req, res) => {
   try {
     const transaction = await Transaction.findById(req.params.id);
@@ -60,7 +58,6 @@ app.get("/api/transactions/:id", async (req, res) => {
   }
 });
 
-// Add new transaction
 app.post("/api/transactions", async (req, res) => {
   try {
     const newTransaction = new Transaction(req.body);
@@ -72,7 +69,6 @@ app.post("/api/transactions", async (req, res) => {
   }
 });
 
-// Update transaction
 app.put("/api/transactions/:id", async (req, res) => {
   try {
     const updatedTransaction = await Transaction.findByIdAndUpdate(
@@ -92,7 +88,6 @@ app.put("/api/transactions/:id", async (req, res) => {
   }
 });
 
-// Delete transaction
 app.delete("/api/transactions/:id", async (req, res) => {
   try {
     const deletedTransaction = await Transaction.findByIdAndDelete(req.params.id);
@@ -108,12 +103,10 @@ app.delete("/api/transactions/:id", async (req, res) => {
   }
 });
 
-// 404 Handler
 app.use((req, res) => {
   res.status(404).json({ success: false, message: "Route not found" });
 });
 
-// Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Finance Tracker server is running at http://localhost:${PORT}`);
+  console.log(`🚀 Finance Tracker server is running on port ${PORT}`);
 });
