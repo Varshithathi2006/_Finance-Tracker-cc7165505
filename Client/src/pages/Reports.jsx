@@ -3,14 +3,15 @@ import { Link } from 'react-router-dom';
 import { useTransactions } from '../components/TransactionContext';
 
 export default function Reports() {
-  const { transactions, deleteTransaction, expenses, incomes } = useTransactions();
+  const { transactions = [], deleteTransaction, expenses = [], incomes = [] } = useTransactions();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [sortBy, setSortBy] = useState('date');
   const [sortOrder, setSortOrder] = useState('desc');
 
-  const totalIncome = incomes.reduce((sum, transaction) => sum + transaction.amount, 0);
-  const totalExpenses = expenses.reduce((sum, transaction) => sum + transaction.amount, 0);
+  // 🛡️ Null-safe reduce
+  const totalIncome = incomes.reduce((sum, transaction) => sum + (transaction?.amount || 0), 0);
+  const totalExpenses = expenses.reduce((sum, transaction) => sum + (transaction?.amount || 0), 0);
   const balance = totalIncome - totalExpenses;
 
   const handleDelete = (id) => {
@@ -28,32 +29,34 @@ export default function Reports() {
 
   // ✅ Search and Filter
   const filteredTransactions = transactions.filter(transaction => {
-    const matchesSearch = transaction.text?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = transaction?.text?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      transaction?.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      transaction?.category?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesType = filterType === 'all' || transaction.type === filterType;
+    const matchesType = filterType === 'all' || transaction?.type === filterType;
 
     return matchesSearch && matchesType;
   });
 
-  // ✅ Sorting
+  // ✅ Sorting with proper ascending/descending logic
   const sortedTransactions = [...filteredTransactions].sort((a, b) => {
     let comparison = 0;
 
     switch (sortBy) {
       case 'amount':
-        comparison = a.amount - b.amount;
+        comparison = (a?.amount || 0) - (b?.amount || 0);
         break;
 
       case 'description':
-        const aDesc = (a.text || '').toLowerCase();
-        const bDesc = (b.text || '').toLowerCase();
+        const aDesc = (a?.text || a?.description || '').toLowerCase();
+        const bDesc = (b?.text || b?.description || '').toLowerCase();
         comparison = aDesc.localeCompare(bDesc);
         break;
 
       case 'date':
       default:
-        const aDate = a.createdAt ? new Date(a.createdAt) : new Date();
-        const bDate = b.createdAt ? new Date(b.createdAt) : new Date();
+        const aDate = a?.date ? new Date(a.date) : new Date();
+        const bDate = b?.date ? new Date(b.date) : new Date();
         comparison = aDate - bDate;
         break;
     }
@@ -148,32 +151,36 @@ export default function Reports() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {sortedTransactions.map((transaction) => (
-                  <tr key={transaction._id} className="hover:bg-gray-50">
+                  <tr key={transaction?._id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                      {transaction.createdAt ? new Date(transaction.createdAt).toLocaleDateString('en-IN') : 'No date'}
+                      {transaction?.date ? new Date(transaction.date).toLocaleDateString('en-IN') : 'No date'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {transaction.text || 'No description'}
+                      {transaction?.text || transaction?.description || 'No description'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${transaction.type === 'income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                        {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        transaction?.type === 'income'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {transaction?.type?.charAt(0).toUpperCase() + transaction?.type?.slice(1)}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <span className={`${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                        {transaction.type === 'income' ? '+' : '-'}₹{transaction.amount.toLocaleString()}
+                      <span className={`${transaction?.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                        {transaction?.type === 'income' ? '+' : '-'}₹{transaction?.amount?.toLocaleString()}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                       <Link
-                        to={`/edit-transaction/${transaction._id}`}
+                        to={`/edit-transaction/${transaction?._id}`}
                         className="text-blue-600 hover:text-blue-900 bg-blue-100 hover:bg-blue-200 px-3 py-1 rounded transition duration-200"
                       >
                         Edit
                       </Link>
                       <button
-                        onClick={() => handleDelete(transaction._id)}
+                        onClick={() => handleDelete(transaction?._id)}
                         className="text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200 px-3 py-1 rounded transition duration-200"
                       >
                         Delete
