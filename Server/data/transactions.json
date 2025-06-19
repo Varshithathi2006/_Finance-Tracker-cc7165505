@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1750183278190
+  },
+  {
+    "id": 1750183336615,
+    "title": "Salary",
+    "amount": 100.5,
+    "type": "expense",
+    "description": "Grocery shopping",
+    "category": "Food",
+    "updatedAt": "2025-06-19T11:48:53.203Z",
+    "text": "yes"
+  },
+  {
+    "id": 1750333535312,
+    "text": "fgh",
+    "amount": 3000,
+    "type": "income",
+    "createdAt": "2025-06-19T11:45:35.312Z",
+    "updatedAt": "2025-06-19T11:45:35.312Z"
+  }
+]
