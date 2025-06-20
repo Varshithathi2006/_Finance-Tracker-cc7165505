@@ -1,4 +1,3 @@
-// TransactionContext.jsx
 import axios from 'axios';
 import { createContext, useContext, useState, useEffect } from 'react';
 
@@ -9,22 +8,25 @@ export function useTransactions() {
 }
 
 export function TransactionProvider({ children }) {
-  const [transactions, setTransactions] = useState([]);
+  const [transactions, setTransactions] = useState([]); 
   const [editingTransaction, setEditingTransaction] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   const API_URL = 'https://finance-tracker-cc7165505.onrender.com/api/transactions';
 
   const fetchTransactions = async () => {
     try {
-      setLoading(true);
       const response = await axios.get(API_URL);
-      setTransactions(response.data.data || []);
-      setLoading(false);
+      const data = response?.data?.data;
+
+      if (Array.isArray(data)) {
+        setTransactions(data);
+      } else {
+        console.warn('API returned non-array data. Resetting to empty array.');
+        setTransactions([]);
+      }
     } catch (error) {
       console.error('Error fetching transactions:', error);
-      setTransactions([]);
-      setLoading(false);
+      setTransactions([]); // Reset to empty array on failure
     }
   };
 
@@ -59,21 +61,15 @@ export function TransactionProvider({ children }) {
     fetchTransactions();
   }, []);
 
-  const incomes = transactions.filter(t => t.type === 'income');
-  const expenses = transactions.filter(t => t.type === 'expense');
-
   return (
     <TransactionContext.Provider value={{
-      transactions,
+      transactions: Array.isArray(transactions) ? transactions : [], // Always safe
       addTransaction,
       updateTransaction,
       deleteTransaction,
       editingTransaction,
       setEditingTransaction,
-      fetchTransactions,
-      loading,
-      incomes,
-      expenses
+      fetchTransactions
     }}>
       {children}
     </TransactionContext.Provider>

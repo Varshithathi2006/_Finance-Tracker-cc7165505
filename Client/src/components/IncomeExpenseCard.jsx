@@ -3,14 +3,13 @@ import { useTransactions } from '../components/TransactionContext';
 export default function IncomeExpenseCard() {
   const { transactions } = useTransactions();
 
-  const income = transactions
-    .filter((t) => t.type === 'income')
-    .reduce((acc, t) => acc + Number(t.amount), 0);
+   const totalIncome = Array.isArray(transactions) && transactions.length >0 ? Transactions
+    .filter(t => t.type === 'income')
+    .reduce((sum, t) => sum + (t?.amount|| 0),0) : 0;
 
-  const expenses = transactions
-    .filter((t) => t.type === 'expense')
-    .reduce((acc, t) => acc + Number(t.amount), 0);
-
+  const totalExpenses = Array.isArray(transactions) && transactions.length >0 ? Transactions
+    .filter(t => t.type === 'expense')
+    .reduce((sum, t) => sum + (t?.amount|| 0),0) : 0;
   return (
     <div className="bg-white shadow-lg rounded-lg p-6 grid grid-cols-2 gap-4 text-center">
       {/* Income Card */}

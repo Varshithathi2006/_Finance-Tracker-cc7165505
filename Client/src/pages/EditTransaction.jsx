@@ -1,38 +1,76 @@
-// EditTransaction.jsx
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useTransactions } from '../components/TransactionContext';
-import TransactionForm from './TransactionForm';
+import TransactionForm from '../components/TransactionForm';
 
 export default function EditTransaction() {
-  const { transactions, updateTransaction, setEditingTransaction } = useTransactions();
   const { id } = useParams();
   const navigate = useNavigate();
-
-  const [currentTransaction, setCurrentTransaction] = useState(null);
+  const { transactions, fetchTransactions, setEditingTransaction } = useTransactions();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const transaction = transactions.find(t => t.id === id || t._id === id);
+    const loadData = async () => {
+      if (transactions.length === 0) {
+        await fetchTransactions(); 
+      }
+      setLoading(false);
+    };
+    loadData();
+  }, [transactions, fetchTransactions]);
+
+  const transaction = transactions.find((t) => t._id === id);
+
+  useEffect(() => {
     if (transaction) {
-      setCurrentTransaction(transaction);
       setEditingTransaction(transaction);
     }
-  }, [id, transactions, setEditingTransaction]);
+  }, [transaction, setEditingTransaction]);
 
-  if (!currentTransaction) return <div className="p-6 text-center text-gray-500">Transaction not found!</div>;
-
-  const handleUpdate = (updatedTransaction) => {
-    updateTransaction(currentTransaction.id || currentTransaction._id, updatedTransaction);
+  const handleEditComplete = () => {
+    setEditingTransaction(null);
     navigate('/reports');
   };
 
+  const handleCancel = () => {
+    setEditingTransaction(null);
+    navigate('/reports');
+  };
+
+  if (loading) {
+    return <div className="p-6 text-center">Loading...</div>;
+  }
+
+  if (!transaction) {
+    return (
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          Transaction not found!
+          <button
+            onClick={() => navigate('/reports')}
+            className="ml-4 bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
+          >
+            Back to Reports
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold text-gray-800 mb-4">Edit Transaction</h1>
+      <div className="mb-4">
+        <button
+          onClick={() => navigate('/reports')}
+          className="text-blue-500 hover:text-blue-700 flex items-center gap-2"
+        >
+          ← Back to Reports
+        </button>
+      </div>
       <TransactionForm
-        editTransaction={currentTransaction}
-        onEditComplete={handleUpdate}
-        onCancel={() => navigate('/reports')}
+        editTransaction={transaction}
+        onEditComplete={handleEditComplete}
+        onCancel={handleCancel}
       />
     </div>
   );

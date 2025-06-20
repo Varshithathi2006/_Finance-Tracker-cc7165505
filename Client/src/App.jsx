@@ -7,11 +7,11 @@ import AddExpense from './pages/AddExpense';
 import AddIncome from './pages/AddIncome';
 import EditTransaction from './pages/EditTransaction';
 import Reports from './pages/Reports';
-import Auth from './components/Auth'; // Updated auth component
-import Profile from './pages/Profile'; // New profile page
+import Auth from './components/Auth'; 
+import Profile from './pages/Profile';
 import AboutUs from './pages/AboutUs';
 import { TransactionProvider } from './components/TransactionContext';
-import { UserProvider } from './components/UserContext'; // New user context
+import { UserProvider } from './components/UserContext'; 
 import './App.css';
 
 function AppLayout() {
