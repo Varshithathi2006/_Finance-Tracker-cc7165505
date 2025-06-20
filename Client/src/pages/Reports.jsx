@@ -9,13 +9,14 @@ export default function Reports() {
   const [sortBy, setSortBy] = useState('date');
   const [sortOrder, setSortOrder] = useState('desc');
 
-  // Handle empty transactions array gracefully
-  const incomes = transactions.filter(t => t?.type === 'income');
-  const expenses = transactions.filter(t => t?.type === 'expense');
-
-  // Fixed the calculations with proper reduce methods
-  const totalIncome = incomes.reduce((sum, transaction) => sum + (transaction.amount || 0), 0);
-  const totalExpenses = expenses.reduce((sum, transaction) => sum + (transaction.amount || 0), 0);
+  // Calculate totals directly from transactions array
+  const totalIncome = (transactions || [])
+    .filter(t => t?.type === 'income')
+    .reduce((sum, transaction) => sum + (transaction.amount || 0), 0);
+    
+  const totalExpenses = (transactions || [])
+    .filter(t => t?.type === 'expense')
+    .reduce((sum, transaction) => sum + (transaction.amount || 0), 0);
   const balance = totalIncome - totalExpenses;
 
   const handleDelete = (id) => {

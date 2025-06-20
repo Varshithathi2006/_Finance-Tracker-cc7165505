@@ -6,7 +6,7 @@ import IncomeChart from '../components/IncomeChart';
 import IncomeExpenseCard from '../components/IncomeExpenseCard';
 import TransactionForm from '../components/TransactionForm';
 import TransactionList from '../components/TransactionList';
-import { useTransactions } from '../components/TransactionContext';
+import { useTransactions } from '../components/TransactionContext'; // ✅ Correct path
 
 export default function Home() {
   const [editingTransaction, setEditingTransaction] = useState(null);
@@ -61,14 +61,14 @@ export default function Home() {
     }
   };
 
-  // Fixed the calculations with proper reduce methods
-  const totalIncome = (transactions || [])
-    .filter(t => t?.type === 'income')
-    .reduce((sum, t) => sum + (t?.amount || 0), 0);
+const totalIncome = (transactions || [])
+  .filter(t => t?.type === 'income')
+  // .reduce((sum, t) => sum + (t?.amount || 0), 0);
 
-  const totalExpenses = (transactions || [])
-    .filter(t => t?.type === 'expense')
-    .reduce((sum, t) => sum + (t?.amount || 0), 0);
+const totalExpenses = (transactions || [])
+  .filter(t => t?.type === 'expense')
+  // .reduce((sum, t) => sum + (t?.amount || 0), 0);
+
 
   const netSavings = totalIncome - totalExpenses;
 
